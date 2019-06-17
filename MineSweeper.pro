@@ -26,10 +26,18 @@ CONFIG += c++11
 
 SOURCES += \
         main.cpp \
-        mainwindow.cpp
+        mainwindow.cpp \
+    block.cpp \
+    minefield.cpp \
+    timer.cpp \
+    mappainter.cpp
 
 HEADERS += \
-        mainwindow.h
+        mainwindow.h \
+    block.h \
+    minefield.h \
+    timer.h \
+    mappainter.h
 
 FORMS += \
         mainwindow.ui
