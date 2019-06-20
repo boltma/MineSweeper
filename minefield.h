@@ -46,6 +46,7 @@ public:
 	MineField(difficulty = easy);
 	MineField(int, int, int);
 	MineField1D operator[](int);
+	friend class MapPainter;
 };
 
 #endif // MINEMAP_H

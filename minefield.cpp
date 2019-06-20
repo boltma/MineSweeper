@@ -57,7 +57,7 @@ void MineField::LayMine(int x, int y)
 MineField::MineField1D MineField::operator[](int r)
 {
 	if (r >= 0 && r < row)
-		return { _map + sizeof(Block) * (r * col), col };
+		return { _map + r * col, col };
 	else
 		throw std::invalid_argument("r");
 }

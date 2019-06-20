@@ -6,9 +6,15 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>400</width>
-    <height>300</height>
+    <width>446</width>
+    <height>516</height>
    </rect>
+  </property>
+  <property name="sizePolicy">
+   <sizepolicy hsizetype="MinimumExpanding" vsizetype="Expanding">
+    <horstretch>3</horstretch>
+    <verstretch>3</verstretch>
+   </sizepolicy>
   </property>
   <property name="windowTitle">
    <string>MainWindow</string>
@@ -24,14 +30,20 @@
      </rect>
     </property>
    </widget>
-   <widget class="QWidget" name="widget" native="true">
+   <widget class="MapPainter" name="widget" native="true">
     <property name="geometry">
      <rect>
-      <x>30</x>
-      <y>20</y>
-      <width>321</width>
-      <height>201</height>
+      <x>50</x>
+      <y>40</y>
+      <width>361</width>
+      <height>331</height>
      </rect>
+    </property>
+    <property name="sizePolicy">
+     <sizepolicy hsizetype="Preferred" vsizetype="Preferred">
+      <horstretch>0</horstretch>
+      <verstretch>0</verstretch>
+     </sizepolicy>
     </property>
    </widget>
   </widget>
@@ -41,7 +53,7 @@
     <rect>
      <x>0</x>
      <y>0</y>
-     <width>400</width>
+     <width>446</width>
      <height>26</height>
     </rect>
    </property>
@@ -61,6 +73,12 @@
    <class>Timer</class>
    <extends>QLCDNumber</extends>
    <header>timer.h</header>
+  </customwidget>
+  <customwidget>
+   <class>MapPainter</class>
+   <extends>QWidget</extends>
+   <header location="global">mappainter.h</header>
+   <container>1</container>
   </customwidget>
  </customwidgets>
  <resources/>

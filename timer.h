@@ -13,12 +13,12 @@ private:
 	QTimer* t;
 
 private slots:
-	void inc_time();
+	void IncTime();
 
 public:
 	explicit Timer(QWidget* parent = nullptr);
 	~Timer();
-	int get_time();
+	int GetTime();
 };
 
 #endif // TIMER_H

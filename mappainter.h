@@ -1,23 +1,19 @@
 #ifndef MAPPAINTER_H
 #define MAPPAINTER_H
 
-#include "block.h"
 #include "minefield.h"
-#include <QPushButton>
+#include <QButtonGroup>
+#include <QGridLayout>
 #include <QWidget>
-
-class MineButton : public QPushButton
-{
-	Q_OBJECT
-public:
-	explicit MineButton(QWidget* parent = nullptr);
-protected:
-	virtual void mousePressEvent(QMouseEvent* event) = 0;
-};
 
 class MapPainter : public QWidget
 {
 	Q_OBJECT
+private:
+	MineField* field;
+	QGridLayout* layout;
+	void UpdateLayout();
+
 public:
 	explicit MapPainter(QWidget* parent = nullptr);
 
