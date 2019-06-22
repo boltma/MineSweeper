@@ -2,10 +2,10 @@
 
 Timer::Timer(QWidget* parent) : QLCDNumber(parent), display_time(0)
 {
-	this->setDigitCount(4); // ÏÔÊ¾4Î»
+	this->setDigitCount(4); // show 4 digits
 	t = new QTimer;
 	t->start(1000);
-	connect(t, SIGNAL(timeout()), this, SLOT(IncTime()));
+	connect(t, &QTimer::timeout, this, &Timer::IncTime);
 }
 
 Timer::~Timer()

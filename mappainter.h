@@ -8,18 +8,18 @@
 
 class MapPainter : public QWidget
 {
-	Q_OBJECT
+Q_OBJECT
+
 private:
 	MineField* field;
 	QGridLayout* layout;
+
+private slots:
 	void UpdateLayout();
 
 public:
 	explicit MapPainter(QWidget* parent = nullptr);
-
-signals:
-
-public slots:
+	~MapPainter();
 };
 
 #endif // MAPPAINTER_H

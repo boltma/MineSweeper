@@ -2,6 +2,7 @@
 #define MINEMAP_H
 
 #include "block.h"
+#include <QObject>
 
 enum difficulty
 {
@@ -14,37 +15,41 @@ enum difficulty
 class Map
 {
 protected:
-	Block* _map;
+    Block* _map;
 	int row;
 	int col;
-	int num; // 布雷数量
+	int num; // number of mines
 
 public:
 	Map(int, int, int);
 	~Map();
 };
 
-class MineField : public Map
+class MineField : public QObject, public Map
 {
+Q_OBJECT
+
 private:
 	/**
-	 * \brief 一维的游戏地图代理类，仅用以重载[]运算符
+	 * \brief 1D proxy class for map, only used for overload []operator
 	 */
 	class MineField1D
 	{
 	private:
-		Block* start_block; // 该行初始位置指针
-		const int c; // 列数（即column）
+		Block* start_block; // pointer to first block of the row
+		const int c; // column number
 	public:
 		MineField1D(Block*, int);
 		Block& operator[](int);
 	};
 
+private slots:
 	void LayMine(int, int);
 
 public:
 	MineField(difficulty = easy);
 	MineField(int, int, int);
+	int CountAdjacentMine(int, int);
 	MineField1D operator[](int);
 	friend class MapPainter;
 };

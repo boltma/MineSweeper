@@ -13,43 +13,67 @@ enum BLOCK_STATUS
 
 class MineButton : public QPushButton
 {
-	Q_OBJECT
-public:
-	explicit MineButton(QWidget* parent = nullptr);
+Q_OBJECT
+
 protected:
-	virtual void mousePressEvent(QMouseEvent* event) override = 0;
+	class Block* const block;
+
+protected:
+	void mousePressEvent(QMouseEvent* event) override = 0;
+
+public:
+	explicit MineButton(Block*, QWidget* parent = nullptr);
 };
 
 class UnclickedButton : public MineButton
 {
+protected:
+	void mousePressEvent(QMouseEvent* event) override;
+
 public:
-	UnclickedButton() {}
-	virtual void mousePressEvent(QMouseEvent* event) override;
+	UnclickedButton(Block*);
 };
 
 class ClickedButton : public MineButton
 {
+private:
+	QIcon* icon;
+
+protected:
+	void mousePressEvent(QMouseEvent* event) override;
+
 public:
-	ClickedButton() {}
-	virtual void mousePressEvent(QMouseEvent* event) override;
+	ClickedButton(Block*, int);
+    ~ClickedButton() override;
 };
 
-// 方格信息
-class Block
+// Block Info
+class Block : public QObject
 {
+Q_OBJECT
+
 private:
+	int row;
+	int col;
 	int flag;
+	int cnt;	// number of Adjacent Mines
 	MineButton* button;
 
 public:
 	Block();
 	~Block();
+	void SetLocation(int, int);
+	void SetAdjacentMine(int);
 	void PlaceMine();
 	void MarkMine();
 	void QuestionMine();
 	void OpenMine();
 	bool HasMine();
 	friend class MapPainter;
+
+signals:
+	void FirstClick(int, int);
+	void Refresh();	// refresh graphics
 };
 
 #endif // BLOCK_H

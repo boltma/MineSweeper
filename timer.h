@@ -4,10 +4,10 @@
 #include <QLCDNumber>
 #include <QTimer>
 
-// ¼ÆÊ±Æ÷
 class Timer : public QLCDNumber
 {
-	Q_OBJECT
+Q_OBJECT
+
 private:
 	int display_time;
 	QTimer* t;
