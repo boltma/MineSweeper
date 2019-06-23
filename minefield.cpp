@@ -11,7 +11,7 @@ Map::Map(int r, int c, int n) : row(r), col(c), num(n)
 	{
 		for (int j = 0; j < c; ++j)
 		{
-			_map[row * i + j].SetLocation(i, j);
+			_map[col * i + j].SetLocation(i, j);
 		}
 	}
 }
@@ -36,32 +36,35 @@ int _size[][3] = {{9, 9, 10}, {16, 16, 40}, {16, 30, 99}};
 
 MineField::MineField(difficulty d) : Map(_size[d][0], _size[d][1], _size[d][2])
 {
-	for (int i = 0; i < row; ++i)
-	{
-		for (int j = 0; j < col; ++j)
-		{
-			connect(&(*this)[i][j], &Block::FirstClick, this, &MineField::LayMine);
-		}
-	}
+	ConnectSignals();
 }
 
 MineField::MineField(int r, int c, int n) : Map(r, c, n)
+{
+	ConnectSignals();
+}
+
+/**
+ * \brief Connect button/block signals to MineField
+ */
+void MineField::ConnectSignals()
 {
 	for (int i = 0; i < row; ++i)
 	{
 		for (int j = 0; j < col; ++j)
 		{
 			connect(&(*this)[i][j], &Block::FirstClick, this, &MineField::LayMine);
+			connect(&(*this)[i][j], &Block::OpenNoAdjacent, this, &MineField::OpenAdjacentBlocks);
 		}
 	}
 }
 
 /**
  * \brief Lay mines according to first move, and set all adjacent numbers
- * \param x Row number of first click
- * \param y Column number of first click
+ * \param r Row number of first click
+ * \param c Column number of first click
  */
-void MineField::LayMine(int x, int y)
+void MineField::LayMine(int r, int c)
 {
 	random_device rd;
 	mt19937 e(rd() + time(nullptr));
@@ -70,13 +73,13 @@ void MineField::LayMine(int x, int y)
 	int cnt = 0;
 	do
 	{
-		int rand_x = row_rand(e);
-		int rand_y = col_rand(e);
-		if (rand_x == x && rand_y == y)
+		int rand_r = row_rand(e);
+		int rand_c = col_rand(e);
+		if (rand_r == r && rand_c == c)
 			continue; // continue if random location is first click location
-		if ((*this)[rand_x][rand_y].HasMine())
+		if ((*this)[rand_r][rand_c].HasMine())
 			continue; // continue if already has mine
-		(*this)[rand_x][rand_y].PlaceMine();
+		(*this)[rand_r][rand_c].PlaceMine();
 		++cnt;
 	}
 	while (cnt < num);
@@ -84,7 +87,38 @@ void MineField::LayMine(int x, int y)
 	{
 		for (int j = 0; j < col; ++j)
 		{
-			(*this)[i][j].SetAdjacentMine(CountAdjacentMine(i, j));
+			(*this)[i][j].SetAdjacentNum(CountAdjacentMine(i, j));
+		}
+	}
+}
+
+/**
+ * \brief Open adjacent blocks if there are no adjacent mines
+ * \param r Row number of click
+ * \param c Column number of click
+ */
+void MineField::OpenAdjacentBlocks(int r, int c)
+{
+	int x[] = {r - 1, r, r + 1};
+	int y[] = {c - 1, c, c + 1};
+	for (auto i : x)
+	{
+		for (auto j : y)
+		{
+			if (i == r && j == c)
+				continue;
+			try
+			{
+				(*this)[i][j].OpenMine();
+			}
+			catch (std::invalid_argument& e)
+			{
+				// jump through invalid row numbers (no need to jump column numbers)
+				if (strcmp(e.what(), "r") == 0)
+				{
+					break;
+				}
+			}
 		}
 	}
 }

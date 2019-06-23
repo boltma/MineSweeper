@@ -1,9 +1,15 @@
 #include "block.h"
 #include <QMouseEvent>
 
-MineButton::MineButton(Block* block, QWidget* parent) : QPushButton(parent), block(block)
+MineButton::MineButton(Block* block, QWidget* parent) : QPushButton(parent), block(block), icon(nullptr)
 {
+	this->setSizePolicy(QSizePolicy::Fixed, QSizePolicy::Fixed);
 	this->setFixedSize(30, 30);
+}
+
+MineButton::~MineButton()
+{
+	delete icon;
 }
 
 UnclickedButton::UnclickedButton(Block* block) : MineButton(block)
@@ -28,10 +34,18 @@ void UnclickedButton::mousePressEvent(QMouseEvent* event)
 	}
 	else if (event->button() == Qt::RightButton)
 	{
+		if(block->HasMark())
+		{
+			block->QuestionMine();
+		}
+		else
+		{
+			block->MarkMine();
+		}
 	}
 }
 
-ClickedButton::ClickedButton(Block* block, int cnt) : MineButton(block), icon(new QIcon)
+ClickedButton::ClickedButton(Block* block, int cnt) : MineButton(block)
 {
 	// Todo: add support for showing adjacent blocks while click with both buttons
 	if (this->block->HasMine())
@@ -64,11 +78,6 @@ ClickedButton::ClickedButton(Block* block, int cnt) : MineButton(block), icon(ne
 			"}\n"));
 }
 
-ClickedButton::~ClickedButton()
-{
-	delete icon;
-}
-
 void ClickedButton::mousePressEvent(QMouseEvent* event)
 {
 }
@@ -88,7 +97,7 @@ void Block::SetLocation(int r, int c)
 	col = c;
 }
 
-void Block::SetAdjacentMine(int n)
+void Block::SetAdjacentNum(int n)
 {
 	cnt = n;
 }
@@ -111,6 +120,12 @@ void Block::QuestionMine()
 
 void Block::OpenMine()
 {
+	if(HasMine())
+	{
+		// Todo: Lose
+	}
+	if (flag & ~MINE) // Open/Question/Mark
+		return;
 	flag |= OPEN;
 	flag &= ~MARK;
 	flag &= ~QUESTION;
@@ -119,12 +134,22 @@ void Block::OpenMine()
 		// Lay mine if first click
 		emit FirstClick(row, col);
 	}
-	delete button;
+	if(cnt == 0)
+	{
+		// Open adjacent blocks recursively if no adjacent mines
+		emit OpenNoAdjacent(row, col);
+	}
+	button->deleteLater();
 	button = new ClickedButton(this, cnt);
-	emit Refresh(); // update layout
+	emit Refresh(row, col); // update layout
 }
 
 bool Block::HasMine()
 {
 	return flag & MINE;
+}
+
+bool Block::HasMark()
+{
+	return flag & MARK;
 }

@@ -17,12 +17,14 @@ Q_OBJECT
 
 protected:
 	class Block* const block;
+	QIcon* icon;
 
 protected:
 	void mousePressEvent(QMouseEvent* event) override = 0;
 
 public:
 	explicit MineButton(Block*, QWidget* parent = nullptr);
+	~MineButton();
 };
 
 class UnclickedButton : public MineButton
@@ -36,15 +38,11 @@ public:
 
 class ClickedButton : public MineButton
 {
-private:
-	QIcon* icon;
-
 protected:
 	void mousePressEvent(QMouseEvent* event) override;
 
 public:
 	ClickedButton(Block*, int);
-    ~ClickedButton() override;
 };
 
 // Block Info
@@ -63,17 +61,19 @@ public:
 	Block();
 	~Block();
 	void SetLocation(int, int);
-	void SetAdjacentMine(int);
+	void SetAdjacentNum(int);
 	void PlaceMine();
 	void MarkMine();
 	void QuestionMine();
 	void OpenMine();
 	bool HasMine();
+	bool HasMark();
 	friend class MapPainter;
 
 signals:
 	void FirstClick(int, int);
-	void Refresh();	// refresh graphics
+	void OpenNoAdjacent(int, int);
+	void Refresh(int, int);	// refresh graphics
 };
 
 #endif // BLOCK_H

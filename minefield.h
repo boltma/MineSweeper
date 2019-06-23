@@ -45,10 +45,12 @@ private:
 
 private slots:
 	void LayMine(int, int);
+	void OpenAdjacentBlocks(int, int);
 
 public:
 	MineField(difficulty = easy);
 	MineField(int, int, int);
+	void ConnectSignals();
 	int CountAdjacentMine(int, int);
 	MineField1D operator[](int);
 	friend class MapPainter;

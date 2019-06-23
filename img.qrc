@@ -1,0 +1,6 @@
+<RCC>
+    <qresource prefix="/">
+        <file>img/flag.png</file>
+        <file>img/minesweeper.png</file>
+    </qresource>
+</RCC>

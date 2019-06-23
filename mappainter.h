@@ -15,7 +15,7 @@ private:
 	QGridLayout* layout;
 
 private slots:
-	void UpdateLayout();
+	void UpdateLayout(int, int);
 
 public:
 	explicit MapPainter(QWidget* parent = nullptr);
