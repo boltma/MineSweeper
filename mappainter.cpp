@@ -35,6 +35,8 @@ MapPainter::MapPainter(QWidget* parent) :
 
 	connect(counter, &Counter::Switch, &UnclickedButton::SwitchStatus);
 	connect(field, &MineField::StartTimer, timer, &Timer::StartTime);
+	connect(field, &MineField::Win, timer, &Timer::StopTime);
+	connect(field, &MineField::Lose, timer, &Timer::StopTime);
 	connect(field, &MineField::DecCounter, counter, &Counter::DecCount);
 	connect(field, &MineField::IncCounter, counter, &Counter::IncCount);
 }

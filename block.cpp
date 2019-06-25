@@ -67,6 +67,8 @@ void UnclickedButton::mousePressEvent(QMouseEvent* event)
 	}
 	else if (event->button() == Qt::RightButton)
 	{
+		if (Block::Lost())
+			return;
 		if (block->HasMark())
 		{
 			// Question
@@ -114,22 +116,16 @@ void UnclickedButton::mousePressEvent(QMouseEvent* event)
 
 ClickedButton::ClickedButton(Block* block, int cnt) : MineButton(block)
 {
-	// Todo: add support for showing adjacent blocks while click with both buttons
 	if (this->block->HasMine())
 	{
-		this->setStyleSheet(QString::fromUtf8("QPushButton:!hover\n"
+		this->setIcon(explosion_flag ? explosion_icon() : mine_icon());
+		this->setStyleSheet(QString::fromUtf8("QPushButton\n"
 			"{\n"
 			"	border: 1px solid darkgray;\n"
 			"	background: qradialgradient(cx : 0.4, cy : -0.1, fx : 0.4, fy : -0.1, radius : 1.35, stop : 0 #fff, stop: 1 #fff);\n"
-			"}\n"
-			"QPushButton:hover\n"
-			"{\n"
-			"	background: qradialgradient(cx : 0.4, cy : -0.1, fx : 0.4, fy : -0.1, radius : 1.35, stop : 0 #fff, stop: 1 #fff);"
-			"	border: 1px solid lightgray;\n"
-			"}"));
+			"}\n"));
 		return;
 	}
-	this->setCheckable(false);
 	if (cnt)
 	{
 		this->setText(QString(1, '0' + cnt));
@@ -144,6 +140,25 @@ ClickedButton::ClickedButton(Block* block, int cnt) : MineButton(block)
 			"	border: 1px solid lightgray;\n"
 			"}\n"));
 }
+
+void ClickedButton::SetFlag(bool flag)
+{
+	explosion_flag = flag;
+}
+
+QIcon& ClickedButton::mine_icon()
+{
+	static QIcon icon(":/mine");
+	return icon;
+}
+
+QIcon& ClickedButton::explosion_icon()
+{
+	static QIcon icon(":/explosion");
+	return icon;
+}
+
+bool ClickedButton::explosion_flag = true;
 
 void ClickedButton::mousePressEvent(QMouseEvent* event)
 {
@@ -164,8 +179,11 @@ void ClickedButton::mouseReleaseEvent(QMouseEvent* event)
 	}
 }
 
+bool Block::lost_flag = false;
+
 Block::Block() : row(0), col(0), flag(0), cnt(-1), button(new UnclickedButton(this))
 {
+	lost_flag = false;
 }
 
 Block::~Block()
@@ -202,6 +220,11 @@ void Block::QuestionMine()
 	emit Question();
 }
 
+bool Block::Lost()
+{
+	return lost_flag;
+}
+
 void Block::OpenMine()
 {
 	if (HasMine())
@@ -227,7 +250,10 @@ void Block::OpenMine()
 	button = new ClickedButton(this, cnt);
 	connect(reinterpret_cast<ClickedButton*>(button), &ClickedButton::DualClick, this, &Block::Dual);
 	connect(reinterpret_cast<ClickedButton*>(button), &ClickedButton::DualRelease, this, &Block::DualR);
+	if (this->HasMine())
+		emit ClickMine();
 	emit Refresh(row, col); // update layout
+	emit DecCnt();
 }
 
 void Block::ClearFlag()
@@ -258,4 +284,9 @@ void Block::Dual()
 void Block::DualR()
 {
 	emit DualRelease(row, col);
+}
+
+void Block::LoseGame()
+{
+	lost_flag = true;
 }

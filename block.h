@@ -52,7 +52,9 @@ class ClickedButton : public MineButton
 Q_OBJECT
 
 private:
-	static QIcon mine_icon;
+	static QIcon& mine_icon();
+	static QIcon& explosion_icon();
+	static bool explosion_flag; // true if click on first mine
 	bool dual_flag = false;
 
 protected:
@@ -61,6 +63,7 @@ protected:
 
 public:
 	ClickedButton(Block*, int);
+	static void SetFlag(bool);
 	void SetStyle() override {}
 	void SetHover() override {}
 
@@ -77,8 +80,9 @@ Q_OBJECT
 private:
 	int row;
 	int col;
-	int flag;
+	int flag; // block status
 	int cnt; // number of Adjacent Mines
+	static bool lost_flag;
 
 public:
 	MineButton* button;
@@ -94,10 +98,12 @@ public:
 	bool HasMine();
 	bool HasMark();
 	bool HasQuestion();
+	static bool Lost();
 
 public slots:
 	void Dual(); // Dual click on clicked button, open adjacent blocks
 	void DualR(); // Dual release
+	static void LoseGame(); // Lost game, set Lost flag
 
 signals:
 	void FirstClick(int, int);
@@ -107,6 +113,8 @@ signals:
 	void Refresh(int, int); // refresh graphics
 	void Mark(); // Mark mine, counter decrement, slot in minefield, then in counter
 	void Question(); // Question block, counter increment
+	void DecCnt(); // Decrease cnt in minefield
+	void ClickMine(); // Click on mine, lose
 };
 
 #endif // BLOCK_H

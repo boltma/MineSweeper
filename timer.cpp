@@ -29,3 +29,10 @@ void Timer::StartTime()
 {
 	t->start(1000);
 }
+
+int Timer::StopTime()
+{
+	// Timer would stop either win or lose, because blocks will always all open
+	t->stop();
+	return display_time;
+}

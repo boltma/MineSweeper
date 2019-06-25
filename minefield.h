@@ -43,11 +43,15 @@ private:
 		Block& operator[](int);
 	};
 
+	int cnt; // #blocks - #mines - #clicked
+
 private slots:
 	void LayMine(int, int);
 	void OpenAdjacentBlocks(int, int);
 	void DualOpen(int, int);
 	void DualRestore(int, int);
+	void DecCnt(); // decrement cnt, emit win when cnt decreased to zero
+	void ClickMine();
 
 public:
 	explicit MineField(difficulty = easy);
@@ -61,6 +65,8 @@ signals:
 	void StartTimer();
 	void DecCounter(); // Mine marked, counter decrement
 	void IncCounter(); // Block questioned, counter increment
+	void Win();
+	void Lose();
 
 	friend class MapPainter;
 };

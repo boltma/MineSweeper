@@ -2,6 +2,7 @@
 #include <ctime>
 #include <random>
 #include <stdexcept>
+#include <QDebug>
 using namespace std;
 
 Map::Map(int r, int c, int n) : row(r), col(c), num(n)
@@ -36,14 +37,16 @@ Block& MineField::MineField1D::operator[](int c)
 
 int _size[][3] = {{9, 9, 10}, {16, 16, 40}, {16, 30, 99}};
 
-MineField::MineField(difficulty d) : Map(_size[d][0], _size[d][1], _size[d][2])
+MineField::MineField(difficulty d) : Map(_size[d][0], _size[d][1], _size[d][2]), cnt(row * col - num)
 {
 	ConnectSignals();
+	ClickedButton::SetFlag(true);
 }
 
-MineField::MineField(int r, int c, int n) : Map(r, c, n)
+MineField::MineField(int r, int c, int n) : Map(r, c, n), cnt(row * col - num)
 {
 	ConnectSignals();
+	ClickedButton::SetFlag(true);
 }
 
 /**
@@ -61,6 +64,9 @@ void MineField::ConnectSignals()
 			connect(&(*this)[i][j], &Block::DualRelease, this, &MineField::DualRestore);
 			connect(&(*this)[i][j], &Block::Mark, this, &MineField::DecCounter);
 			connect(&(*this)[i][j], &Block::Question, this, &MineField::IncCounter);
+			connect(&(*this)[i][j], &Block::DecCnt, this, &MineField::DecCnt);
+			connect(&(*this)[i][j], &Block::ClickMine, this, &MineField::ClickMine);
+			connect(this, &MineField::Lose, &Block::LoseGame);
 		}
 	}
 }
@@ -136,8 +142,8 @@ void MineField::DualOpen(int r, int c)
 		OpenAdjacentBlocks(r, c);
 	else
 	{
-		int x[] = { r - 1, r, r + 1 };
-		int y[] = { c - 1, c, c + 1 };
+		int x[] = {r - 1, r, r + 1};
+		int y[] = {c - 1, c, c + 1};
 		for (auto i : x)
 		{
 			for (auto j : y)
@@ -164,8 +170,8 @@ void MineField::DualOpen(int r, int c)
 // Restore status after release
 void MineField::DualRestore(int r, int c)
 {
-	int x[] = { r - 1, r, r + 1 };
-	int y[] = { c - 1, c, c + 1 };
+	int x[] = {r - 1, r, r + 1};
+	int y[] = {c - 1, c, c + 1};
 	for (auto i : x)
 	{
 		for (auto j : y)
@@ -186,6 +192,34 @@ void MineField::DualRestore(int r, int c)
 			}
 		}
 	}
+}
+
+void MineField::DecCnt()
+{
+	--cnt;
+	if (!cnt)
+	{
+		emit Win();
+		qDebug() << "haha"; // Todo
+	}
+}
+
+void MineField::ClickMine()
+{
+	ClickedButton::SetFlag(false);
+	// All open, timer would stop
+	for (int i = 0; i < row; ++i)
+	{
+		for (int j = 0; j < col; ++j)
+		{
+			Block& block = (*this)[i][j];
+			block.OpenMine();
+			if (!block.HasMine() && (block.HasMark() || block.HasQuestion()))
+				//block.button->setEnabled(false);
+			block.button->setDisabled(true);
+		}
+	}
+	emit Lose(); // todo
 }
 
 /**
@@ -231,8 +265,8 @@ int MineField::CountAdjacentMine(int r, int c)
  */
 int MineField::CountAdjacentMark(int r, int c)
 {
-	int x[] = { r - 1, r, r + 1 };
-	int y[] = { c - 1, c, c + 1 };
+	int x[] = {r - 1, r, r + 1};
+	int y[] = {c - 1, c, c + 1};
 	int cnt = 0;
 	for (auto i : x)
 	{

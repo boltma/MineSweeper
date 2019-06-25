@@ -22,6 +22,7 @@ public:
 
 public slots:
 	void StartTime();
+	int StopTime();
 };
 
 #endif // TIMER_H
