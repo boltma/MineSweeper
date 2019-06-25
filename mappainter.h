@@ -2,7 +2,8 @@
 #define MAPPAINTER_H
 
 #include "minefield.h"
-#include <QButtonGroup>
+#include "timer.h"
+#include "counter.h"
 #include <QGridLayout>
 #include <QWidget>
 
@@ -12,6 +13,9 @@ Q_OBJECT
 
 private:
 	MineField* field;
+	Timer* timer;
+	Counter* counter;
+	QSpacerItem* spacer;
 	QGridLayout* layout;
 
 private slots:

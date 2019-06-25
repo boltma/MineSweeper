@@ -20,21 +20,11 @@
    <string>MainWindow</string>
   </property>
   <widget class="QWidget" name="centralWidget">
-   <widget class="Timer" name="lcdNumber">
-    <property name="geometry">
-     <rect>
-      <x>30</x>
-      <y>0</y>
-      <width>64</width>
-      <height>23</height>
-     </rect>
-    </property>
-   </widget>
    <widget class="MapPainter" name="widget" native="true">
     <property name="geometry">
      <rect>
-      <x>50</x>
-      <y>40</y>
+      <x>20</x>
+      <y>20</y>
       <width>361</width>
       <height>331</height>
      </rect>
@@ -69,11 +59,6 @@
  </widget>
  <layoutdefault spacing="6" margin="11"/>
  <customwidgets>
-  <customwidget>
-   <class>Timer</class>
-   <extends>QLCDNumber</extends>
-   <header>timer.h</header>
-  </customwidget>
   <customwidget>
    <class>MapPainter</class>
    <extends>QWidget</extends>

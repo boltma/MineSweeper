@@ -15,10 +15,10 @@ enum difficulty
 class Map
 {
 protected:
-    Block* _map;
-	int row;
-	int col;
-	int num; // number of mines
+	Block* _map;
+	const int row;
+	const int col;
+	const int num; // number of mines
 
 public:
 	Map(int, int, int);
@@ -36,7 +36,7 @@ private:
 	class MineField1D
 	{
 	private:
-		Block* start_block; // pointer to first block of the row
+		Block* const start_block; // pointer to first block of the row
 		const int c; // column number
 	public:
 		MineField1D(Block*, int);
@@ -46,13 +46,22 @@ private:
 private slots:
 	void LayMine(int, int);
 	void OpenAdjacentBlocks(int, int);
+	void DualOpen(int, int);
+	void DualRestore(int, int);
 
 public:
-	MineField(difficulty = easy);
+	explicit MineField(difficulty = easy);
 	MineField(int, int, int);
 	void ConnectSignals();
 	int CountAdjacentMine(int, int);
+	int CountAdjacentMark(int, int);
 	MineField1D operator[](int);
+
+signals:
+	void StartTimer();
+	void DecCounter(); // Mine marked, counter decrement
+	void IncCounter(); // Block questioned, counter increment
+
 	friend class MapPainter;
 };
 

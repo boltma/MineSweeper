@@ -1,10 +1,8 @@
 #include "timer.h"
 
-Timer::Timer(QWidget* parent) : QLCDNumber(parent), display_time(0)
+Timer::Timer(QWidget* parent) : QLCDNumber(parent), display_time(0), t(new QTimer)
 {
-	this->setDigitCount(4); // show 4 digits
-	t = new QTimer;
-	t->start(1000);
+	this->setFixedSize(90, 40);
 	connect(t, &QTimer::timeout, this, &Timer::IncTime);
 }
 
@@ -25,4 +23,9 @@ void Timer::IncTime()
 int Timer::GetTime()
 {
 	return display_time;
+}
+
+void Timer::StartTime()
+{
+	t->start(1000);
 }

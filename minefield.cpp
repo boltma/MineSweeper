@@ -6,6 +6,8 @@ using namespace std;
 
 Map::Map(int r, int c, int n) : row(r), col(c), num(n)
 {
+	if (r <= 0 || c <= 0 || n <= 0) // Todo: invalid argument exception
+		throw std::invalid_argument("Invalid argument!");
 	_map = new Block[row * col];
 	for (int i = 0; i < r; ++i)
 	{
@@ -54,7 +56,11 @@ void MineField::ConnectSignals()
 		for (int j = 0; j < col; ++j)
 		{
 			connect(&(*this)[i][j], &Block::FirstClick, this, &MineField::LayMine);
-			connect(&(*this)[i][j], &Block::OpenNoAdjacent, this, &MineField::OpenAdjacentBlocks);
+			connect(&(*this)[i][j], &Block::OpenAdjacent, this, &MineField::OpenAdjacentBlocks);
+			connect(&(*this)[i][j], &Block::DualClick, this, &MineField::DualOpen);
+			connect(&(*this)[i][j], &Block::DualRelease, this, &MineField::DualRestore);
+			connect(&(*this)[i][j], &Block::Mark, this, &MineField::DecCounter);
+			connect(&(*this)[i][j], &Block::Question, this, &MineField::IncCounter);
 		}
 	}
 }
@@ -90,6 +96,7 @@ void MineField::LayMine(int r, int c)
 			(*this)[i][j].SetAdjacentNum(CountAdjacentMine(i, j));
 		}
 	}
+	emit StartTimer();
 }
 
 /**
@@ -123,6 +130,64 @@ void MineField::OpenAdjacentBlocks(int r, int c)
 	}
 }
 
+void MineField::DualOpen(int r, int c)
+{
+	if (CountAdjacentMark(r, c) == CountAdjacentMine(r, c))
+		OpenAdjacentBlocks(r, c);
+	else
+	{
+		int x[] = { r - 1, r, r + 1 };
+		int y[] = { c - 1, c, c + 1 };
+		for (auto i : x)
+		{
+			for (auto j : y)
+			{
+				if (i == r && j == c)
+					continue;
+				try
+				{
+					(*this)[i][j].button->SetHover();
+				}
+				catch (std::invalid_argument& e)
+				{
+					// jump through invalid row numbers (no need to jump column numbers)
+					if (strcmp(e.what(), "r") == 0)
+					{
+						break;
+					}
+				}
+			}
+		}
+	}
+}
+
+// Restore status after release
+void MineField::DualRestore(int r, int c)
+{
+	int x[] = { r - 1, r, r + 1 };
+	int y[] = { c - 1, c, c + 1 };
+	for (auto i : x)
+	{
+		for (auto j : y)
+		{
+			if (i == r && j == c)
+				continue;
+			try
+			{
+				(*this)[i][j].button->SetStyle();
+			}
+			catch (std::invalid_argument& e)
+			{
+				// jump through invalid row numbers (no need to jump column numbers)
+				if (strcmp(e.what(), "r") == 0)
+				{
+					break;
+				}
+			}
+		}
+	}
+}
+
 /**
  * \brief Count adjacent mines
  * \param r Row number
@@ -143,6 +208,41 @@ int MineField::CountAdjacentMine(int r, int c)
 			try
 			{
 				if ((*this)[i][j].HasMine())
+					++cnt;
+			}
+			catch (std::invalid_argument& e)
+			{
+				// jump through invalid row numbers (no need to jump column numbers)
+				if (strcmp(e.what(), "r") == 0)
+				{
+					break;
+				}
+			}
+		}
+	}
+	return cnt;
+}
+
+/**
+ * \brief Count adjacent marks
+ * \param r Row number
+ * \param c Column number
+ * \return Number of adjacent marks
+ */
+int MineField::CountAdjacentMark(int r, int c)
+{
+	int x[] = { r - 1, r, r + 1 };
+	int y[] = { c - 1, c, c + 1 };
+	int cnt = 0;
+	for (auto i : x)
+	{
+		for (auto j : y)
+		{
+			if (i == r && j == c)
+				continue;
+			try
+			{
+				if ((*this)[i][j].HasMark())
 					++cnt;
 			}
 			catch (std::invalid_argument& e)

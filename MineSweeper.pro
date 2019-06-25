@@ -30,14 +30,16 @@ SOURCES += \
     block.cpp \
     minefield.cpp \
     timer.cpp \
-    mappainter.cpp
+    mappainter.cpp \
+    counter.cpp
 
 HEADERS += \
         mainwindow.h \
     block.h \
     minefield.h \
     timer.h \
-    mappainter.h
+    mappainter.h \
+    counter.h
 
 FORMS += \
         mainwindow.ui

@@ -19,6 +19,9 @@ public:
 	explicit Timer(QWidget* parent = nullptr);
 	~Timer();
 	int GetTime();
+
+public slots:
+	void StartTime();
 };
 
 #endif // TIMER_H

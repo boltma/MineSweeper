@@ -1,6 +1,7 @@
 <RCC>
     <qresource prefix="/">
-        <file>img/flag.png</file>
-        <file>img/minesweeper.png</file>
+        <file alias="flag">img/flag.png</file>
+        <file alias="minesweeper">img/minesweeper.png</file>
+        <file alias="explosion">img/explosion.png</file>
     </qresource>
 </RCC>

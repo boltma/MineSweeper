@@ -1,16 +1,19 @@
 #include "block.h"
 #include <QMouseEvent>
 
-MineButton::MineButton(Block* block, QWidget* parent) : QPushButton(parent), block(block), icon(nullptr)
+MineButton::MineButton(Block* block, QWidget* parent) : QPushButton(parent), block(block)
 {
 	this->setSizePolicy(QSizePolicy::Fixed, QSizePolicy::Fixed);
 	this->setFixedSize(30, 30);
 }
 
-MineButton::~MineButton()
+QIcon& UnclickedButton::flag_icon()
 {
-	delete icon;
+	static QIcon icon(":/flag");
+	return icon;
 }
+
+bool UnclickedButton::MarkAvailable = true;
 
 UnclickedButton::UnclickedButton(Block* block) : MineButton(block)
 {
@@ -21,9 +24,39 @@ UnclickedButton::UnclickedButton(Block* block) : MineButton(block)
 		"}\n"
 		"QPushButton:hover\n"
 		"{\n"
-		"	background: qradialgradient(cx : 0.4, cy : -0.1, fx : 0.4, fy : -0.1, radius : 1.35, stop : 0 #fff, stop: 1 rgb(159, 186, 214));"
+		"	background: qradialgradient(cx : 0.4, cy : -0.1, fx : 0.4, fy : -0.1, radius : 1.35, stop : 0 #fff, stop: 1 rgb(159, 186, 214));\n"
 		"	border: 1px solid lightgray;\n"
 		"}"));
+}
+
+void UnclickedButton::SetStyle()
+{
+	this->setStyleSheet(QString::fromUtf8("QPushButton:!hover\n"
+		"{\n"
+		"	border: 1px solid darkgray;\n"
+		"	background: qradialgradient(cx : 0.4, cy : -0.1, fx : 0.4, fy : -0.1, radius : 1.35, stop : 0 #fff, stop: 1 #bbb);\n"
+		"}\n"
+		"QPushButton:hover\n"
+		"{\n"
+		"	background: qradialgradient(cx : 0.4, cy : -0.1, fx : 0.4, fy : -0.1, radius : 1.35, stop : 0 #fff, stop: 1 rgb(159, 186, 214));\n"
+		"	border: 1px solid lightgray;\n"
+		"}"));
+}
+
+void UnclickedButton::SetHover()
+{
+	if (block->HasMark() || block->HasQuestion())
+		return;
+	this->setStyleSheet(QString::fromUtf8("QPushButton\n"
+		"{\n"
+		"	background: rgba(171, 255, 255, 50);\n"
+		"	border: 1px solid lightgray;\n"
+		"}"));
+}
+
+void UnclickedButton::SwitchStatus()
+{
+	MarkAvailable = !MarkAvailable;
 }
 
 void UnclickedButton::mousePressEvent(QMouseEvent* event)
@@ -34,12 +67,46 @@ void UnclickedButton::mousePressEvent(QMouseEvent* event)
 	}
 	else if (event->button() == Qt::RightButton)
 	{
-		if(block->HasMark())
+		if (block->HasMark())
 		{
+			// Question
+			this->setText(QString(1, '?'));
+			this->setIcon(QIcon());
+			this->setStyleSheet(QString::fromUtf8("QPushButton\n"
+				"{\n"
+				"	background: qradialgradient(cx : 0.4, cy : -0.1, fx : 0.4, fy : -0.1, radius : 1.35, stop : 0 #fff, stop: 1 #bbb);\n"
+				"	font-weight: bold;\n"
+				"	border: 1px solid darkgray;\n"
+				"}\n"));
 			block->QuestionMine();
+		}
+		else if (block->HasQuestion())
+		{
+			// Clear
+			this->setText("");
+			this->setStyleSheet(QString::fromUtf8("QPushButton:!hover\n"
+				"{\n"
+				"	border: 1px solid darkgray;\n"
+				"	background: qradialgradient(cx : 0.4, cy : -0.1, fx : 0.4, fy : -0.1, radius : 1.35, stop : 0 #fff, stop: 1 #bbb);\n"
+				"}\n"
+				"QPushButton:hover\n"
+				"{\n"
+				"	background: qradialgradient(cx : 0.4, cy : -0.1, fx : 0.4, fy : -0.1, radius : 1.35, stop : 0 #fff, stop: 1 rgb(159, 186, 214));\n"
+				"	border: 1px solid lightgray;\n"
+				"}"));
+			block->ClearFlag();
 		}
 		else
 		{
+			// Mark
+			if (!MarkAvailable)
+				return;
+			this->setIcon(flag_icon());
+			this->setStyleSheet(QString::fromUtf8("QPushButton\n"
+				"{\n"
+				"	background: qradialgradient(cx : 0.4, cy : -0.1, fx : 0.4, fy : -0.1, radius : 1.35, stop : 0 #fff, stop: 1 #bbb);\n"
+				"	border: 1px solid darkgray;\n"
+				"}\n"));
 			block->MarkMine();
 		}
 	}
@@ -80,6 +147,21 @@ ClickedButton::ClickedButton(Block* block, int cnt) : MineButton(block)
 
 void ClickedButton::mousePressEvent(QMouseEvent* event)
 {
+	if (event->buttons() & Qt::LeftButton && event->buttons() & Qt::RightButton)
+	{
+		emit DualClick();
+		dual_flag = true;
+	}
+}
+
+void ClickedButton::mouseReleaseEvent(QMouseEvent* event)
+{
+	if(dual_flag)
+	{
+		// Todo
+		emit DualRelease();
+		dual_flag = false;
+	}
 }
 
 Block::Block() : row(0), col(0), flag(0), cnt(-1), button(new UnclickedButton(this))
@@ -110,17 +192,19 @@ void Block::PlaceMine()
 void Block::MarkMine()
 {
 	flag |= MARK;
+	emit Mark();
 }
 
 void Block::QuestionMine()
 {
 	flag |= QUESTION;
 	flag &= ~MARK;
+	emit Question();
 }
 
 void Block::OpenMine()
 {
-	if(HasMine())
+	if (HasMine())
 	{
 		// Todo: Lose
 	}
@@ -134,14 +218,21 @@ void Block::OpenMine()
 		// Lay mine if first click
 		emit FirstClick(row, col);
 	}
-	if(cnt == 0)
+	if (cnt == 0)
 	{
 		// Open adjacent blocks recursively if no adjacent mines
-		emit OpenNoAdjacent(row, col);
+		emit OpenAdjacent(row, col);
 	}
 	button->deleteLater();
 	button = new ClickedButton(this, cnt);
+	connect(reinterpret_cast<ClickedButton*>(button), &ClickedButton::DualClick, this, &Block::Dual);
+	connect(reinterpret_cast<ClickedButton*>(button), &ClickedButton::DualRelease, this, &Block::DualR);
 	emit Refresh(row, col); // update layout
+}
+
+void Block::ClearFlag()
+{
+	flag &= MINE | OPEN;
 }
 
 bool Block::HasMine()
@@ -152,4 +243,19 @@ bool Block::HasMine()
 bool Block::HasMark()
 {
 	return flag & MARK;
+}
+
+bool Block::HasQuestion()
+{
+	return flag & QUESTION;
+}
+
+void Block::Dual()
+{
+	emit DualClick(row, col);
+}
+
+void Block::DualR()
+{
+	emit DualRelease(row, col);
 }
