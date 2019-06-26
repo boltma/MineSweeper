@@ -31,7 +31,9 @@ SOURCES += \
     minefield.cpp \
     timer.cpp \
     mappainter.cpp \
-    counter.cpp
+    counter.cpp \
+    gamebutton.cpp \
+    ranking.cpp
 
 HEADERS += \
         mainwindow.h \
@@ -39,7 +41,9 @@ HEADERS += \
     minefield.h \
     timer.h \
     mappainter.h \
-    counter.h
+    counter.h \
+    gamebutton.h \
+    ranking.h
 
 FORMS += \
         mainwindow.ui

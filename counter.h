@@ -12,6 +12,7 @@ private:
 
 public:
     Counter(int = 0);
+	void SetCnt(int);
 
 signals:
 	void Switch(); // cnt has decreased to zero or leaves zero

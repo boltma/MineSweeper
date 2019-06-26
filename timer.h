@@ -19,10 +19,11 @@ public:
 	explicit Timer(QWidget* parent = nullptr);
 	~Timer();
 	int GetTime();
+	void Reset();
 
 public slots:
 	void StartTime();
-	int StopTime();
+	void StopTime();
 };
 
 #endif // TIMER_H

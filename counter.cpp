@@ -6,6 +6,12 @@ Counter::Counter(int n) : cnt(n)
 	this->display(cnt);
 }
 
+void Counter::SetCnt(int n)
+{
+	cnt = n;
+	this->display(cnt);
+}
+
 void Counter::DecCount()
 {
 	this->display(--cnt);

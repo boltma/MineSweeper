@@ -44,6 +44,7 @@ private:
 	};
 
 	int cnt; // #blocks - #mines - #clicked
+	void MarkAll(); // Mark all unclicked buttons after winning
 
 private slots:
 	void LayMine(int, int);
@@ -56,7 +57,7 @@ private slots:
 public:
 	explicit MineField(difficulty = easy);
 	MineField(int, int, int);
-	void ConnectSignals();
+	void Initialize();
 	int CountAdjacentMine(int, int);
 	int CountAdjacentMark(int, int);
 	MineField1D operator[](int);

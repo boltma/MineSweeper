@@ -2,7 +2,6 @@
 #include <ctime>
 #include <random>
 #include <stdexcept>
-#include <QDebug>
 using namespace std;
 
 Map::Map(int r, int c, int n) : row(r), col(c), num(n)
@@ -39,21 +38,22 @@ int _size[][3] = {{9, 9, 10}, {16, 16, 40}, {16, 30, 99}};
 
 MineField::MineField(difficulty d) : Map(_size[d][0], _size[d][1], _size[d][2]), cnt(row * col - num)
 {
-	ConnectSignals();
+	Initialize();
 	ClickedButton::SetFlag(true);
 }
 
 MineField::MineField(int r, int c, int n) : Map(r, c, n), cnt(row * col - num)
 {
-	ConnectSignals();
+	Initialize();
 	ClickedButton::SetFlag(true);
 }
 
 /**
  * \brief Connect button/block signals to MineField
  */
-void MineField::ConnectSignals()
+void MineField::Initialize()
 {
+	UnclickedButton::SetMarkAvailable();
 	for (int i = 0; i < row; ++i)
 	{
 		for (int j = 0; j < col; ++j)
@@ -67,6 +67,17 @@ void MineField::ConnectSignals()
 			connect(&(*this)[i][j], &Block::DecCnt, this, &MineField::DecCnt);
 			connect(&(*this)[i][j], &Block::ClickMine, this, &MineField::ClickMine);
 			connect(this, &MineField::Lose, &Block::LoseGame);
+		}
+	}
+}
+
+void MineField::MarkAll()
+{
+	for(int i = 0; i < row; ++i)
+	{
+		for(int j = 0; j < col; ++j)
+		{
+			(*this)[i][j].button->SetMark();
 		}
 	}
 }
@@ -196,16 +207,21 @@ void MineField::DualRestore(int r, int c)
 
 void MineField::DecCnt()
 {
+	if (Block::Lost())
+		return; // No decrement if already lost
 	--cnt;
 	if (!cnt)
 	{
+		MarkAll(); // First mark all, then emit Win signal
 		emit Win();
-		qDebug() << "haha"; // Todo
+		// Todo
 	}
 }
 
 void MineField::ClickMine()
 {
+	emit Lose(); // First emit Lose signal, then open all
+	// todo
 	ClickedButton::SetFlag(false);
 	// All open, timer would stop
 	for (int i = 0; i < row; ++i)
@@ -215,11 +231,9 @@ void MineField::ClickMine()
 			Block& block = (*this)[i][j];
 			block.OpenMine();
 			if (!block.HasMine() && (block.HasMark() || block.HasQuestion()))
-				//block.button->setEnabled(false);
-			block.button->setDisabled(true);
+				block.button->setDisabled(true);
 		}
 	}
-	emit Lose(); // todo
 }
 
 /**

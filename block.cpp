@@ -29,8 +29,16 @@ UnclickedButton::UnclickedButton(Block* block) : MineButton(block)
 		"}"));
 }
 
+void UnclickedButton::SetMarkAvailable(bool flag)
+{
+	MarkAvailable = flag;
+}
+
+// SetStyle After Dual Click Hover
 void UnclickedButton::SetStyle()
 {
+	if (block->HasMark() || block->HasQuestion())
+		return;
 	this->setStyleSheet(QString::fromUtf8("QPushButton:!hover\n"
 		"{\n"
 		"	border: 1px solid darkgray;\n"
@@ -54,6 +62,19 @@ void UnclickedButton::SetHover()
 		"}"));
 }
 
+void UnclickedButton::SetMark()
+{
+	if (Block::Lost() || !MarkAvailable || block->HasMark())
+		return;
+	this->setIcon(flag_icon());
+	this->setStyleSheet(QString::fromUtf8("QPushButton\n"
+		"{\n"
+		"	background: qradialgradient(cx : 0.4, cy : -0.1, fx : 0.4, fy : -0.1, radius : 1.35, stop : 0 #fff, stop: 1 #bbb);\n"
+		"	border: 1px solid darkgray;\n"
+		"}\n"));
+	block->MarkMine();
+}
+
 void UnclickedButton::SwitchStatus()
 {
 	MarkAvailable = !MarkAvailable;
@@ -68,7 +89,14 @@ void UnclickedButton::mousePressEvent(QMouseEvent* event)
 	else if (event->button() == Qt::RightButton)
 	{
 		if (Block::Lost())
+		{
+			this->setStyleSheet(QString::fromUtf8("QPushButton\n"
+				"{\n"
+				"	background: qradialgradient(cx : 0.4, cy : -0.1, fx : 0.4, fy : -0.1, radius : 1.35, stop : 0 #fff, stop: 1 #bbb);\n"
+				"	border: 1px solid darkgray;\n"
+				"}\n"));
 			return;
+		}
 		if (block->HasMark())
 		{
 			// Question
@@ -100,16 +128,7 @@ void UnclickedButton::mousePressEvent(QMouseEvent* event)
 		}
 		else
 		{
-			// Mark
-			if (!MarkAvailable)
-				return;
-			this->setIcon(flag_icon());
-			this->setStyleSheet(QString::fromUtf8("QPushButton\n"
-				"{\n"
-				"	background: qradialgradient(cx : 0.4, cy : -0.1, fx : 0.4, fy : -0.1, radius : 1.35, stop : 0 #fff, stop: 1 #bbb);\n"
-				"	border: 1px solid darkgray;\n"
-				"}\n"));
-			block->MarkMine();
+			SetMark(); // Mark
 		}
 	}
 }

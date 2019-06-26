@@ -25,6 +25,7 @@ public:
 	explicit MineButton(Block*, QWidget* parent = nullptr);
 	virtual void SetStyle() = 0;
 	virtual void SetHover() = 0;
+	virtual void SetMark() = 0;
 };
 
 class UnclickedButton : public MineButton
@@ -40,8 +41,10 @@ protected:
 
 public:
 	UnclickedButton(Block*);
+	static void SetMarkAvailable(bool = true);
 	void SetStyle() override;
 	void SetHover() override;
+	void SetMark() override;
 
 public slots:
 	static void SwitchStatus();
@@ -66,6 +69,7 @@ public:
 	static void SetFlag(bool);
 	void SetStyle() override {}
 	void SetHover() override {}
+	void SetMark() override {}
 
 signals:
 	void DualClick();

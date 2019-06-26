@@ -25,14 +25,20 @@ int Timer::GetTime()
 	return display_time;
 }
 
+void Timer::Reset()
+{
+	t->stop();
+	display_time = 0;
+	this->display(display_time);
+}
+
 void Timer::StartTime()
 {
 	t->start(1000);
 }
 
-int Timer::StopTime()
+void Timer::StopTime()
 {
 	// Timer would stop either win or lose, because blocks will always all open
 	t->stop();
-	return display_time;
 }
