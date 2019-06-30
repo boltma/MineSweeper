@@ -8,7 +8,8 @@ enum difficulty
 {
 	easy,
 	medium,
-	hard
+	hard,
+	NA // null difficulty
 };
 
 // 地图
@@ -40,27 +41,28 @@ private:
 		const int c; // column number
 	public:
 		MineField1D(Block*, int);
-		Block& operator[](int);
+		Block& operator[](int) const;
 	};
 
 	int cnt; // #blocks - #mines - #clicked
-	void MarkAll(); // Mark all unclicked buttons after winning
+	void MarkAll() const; // Mark all unclicked buttons after winning
 
 private slots:
 	void LayMine(int, int);
-	void OpenAdjacentBlocks(int, int);
-	void DualOpen(int, int);
-	void DualRestore(int, int);
+	void OpenAdjacentBlocks(int, int) const;
+	void DualOpen(int, int) const;
+	void DualRestore(int, int) const;
 	void DecCnt(); // decrement cnt, emit win when cnt decreased to zero
 	void ClickMine();
 
 public:
 	explicit MineField(difficulty = easy);
 	MineField(int, int, int);
-	void Initialize();
-	int CountAdjacentMine(int, int);
-	int CountAdjacentMark(int, int);
-	MineField1D operator[](int);
+	void Initialize() const;
+	int CountAdjacentMine(int, int) const;
+	int CountAdjacentMark(int, int) const;
+	difficulty GetDifficulty() const;
+	MineField1D operator[](int) const;
 
 signals:
 	void StartTimer();

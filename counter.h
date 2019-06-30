@@ -11,7 +11,7 @@ private:
 	int cnt;
 
 public:
-    Counter(int = 0);
+	Counter(int = 0);
 	void SetCnt(int);
 
 signals:

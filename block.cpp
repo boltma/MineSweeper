@@ -66,6 +66,7 @@ void UnclickedButton::SetMark()
 {
 	if (Block::Lost() || !MarkAvailable || block->HasMark())
 		return;
+	this->setText(""); // clear question if possible
 	this->setIcon(flag_icon());
 	this->setStyleSheet(QString::fromUtf8("QPushButton\n"
 		"{\n"
@@ -188,9 +189,9 @@ void ClickedButton::mousePressEvent(QMouseEvent* event)
 	}
 }
 
-void ClickedButton::mouseReleaseEvent(QMouseEvent* event)
+void ClickedButton::mouseReleaseEvent(QMouseEvent*)
 {
-	if(dual_flag)
+	if (dual_flag)
 	{
 		// Todo
 		emit DualRelease();
@@ -207,6 +208,7 @@ Block::Block() : row(0), col(0), flag(0), cnt(-1), button(new UnclickedButton(th
 
 Block::~Block()
 {
+	button->setParent(nullptr);
 	delete button;
 }
 

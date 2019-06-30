@@ -23,11 +23,9 @@ Map::~Map()
 	delete[] _map;
 }
 
-MineField::MineField1D::MineField1D(Block* s, int c) : start_block(s), c(c)
-{
-}
+MineField::MineField1D::MineField1D(Block* s, int c) : start_block(s), c(c) {}
 
-Block& MineField::MineField1D::operator[](int c)
+Block& MineField::MineField1D::operator[](int c) const
 {
 	if (c >= 0 && c < this->c)
 		return start_block[c];
@@ -51,7 +49,7 @@ MineField::MineField(int r, int c, int n) : Map(r, c, n), cnt(row * col - num)
 /**
  * \brief Connect button/block signals to MineField
  */
-void MineField::Initialize()
+void MineField::Initialize() const
 {
 	UnclickedButton::SetMarkAvailable();
 	for (int i = 0; i < row; ++i)
@@ -71,11 +69,11 @@ void MineField::Initialize()
 	}
 }
 
-void MineField::MarkAll()
+void MineField::MarkAll() const
 {
-	for(int i = 0; i < row; ++i)
+	for (int i = 0; i < row; ++i)
 	{
-		for(int j = 0; j < col; ++j)
+		for (int j = 0; j < col; ++j)
 		{
 			(*this)[i][j].button->SetMark();
 		}
@@ -121,7 +119,7 @@ void MineField::LayMine(int r, int c)
  * \param r Row number of click
  * \param c Column number of click
  */
-void MineField::OpenAdjacentBlocks(int r, int c)
+void MineField::OpenAdjacentBlocks(int r, int c) const
 {
 	int x[] = {r - 1, r, r + 1};
 	int y[] = {c - 1, c, c + 1};
@@ -147,7 +145,7 @@ void MineField::OpenAdjacentBlocks(int r, int c)
 	}
 }
 
-void MineField::DualOpen(int r, int c)
+void MineField::DualOpen(int r, int c) const
 {
 	if (CountAdjacentMark(r, c) == CountAdjacentMine(r, c))
 		OpenAdjacentBlocks(r, c);
@@ -179,7 +177,7 @@ void MineField::DualOpen(int r, int c)
 }
 
 // Restore status after release
-void MineField::DualRestore(int r, int c)
+void MineField::DualRestore(int r, int c) const
 {
 	int x[] = {r - 1, r, r + 1};
 	int y[] = {c - 1, c, c + 1};
@@ -242,7 +240,7 @@ void MineField::ClickMine()
  * \param c Column number
  * \return Number of adjacent mines
  */
-int MineField::CountAdjacentMine(int r, int c)
+int MineField::CountAdjacentMine(int r, int c) const
 {
 	int x[] = {r - 1, r, r + 1};
 	int y[] = {c - 1, c, c + 1};
@@ -277,7 +275,7 @@ int MineField::CountAdjacentMine(int r, int c)
  * \param c Column number
  * \return Number of adjacent marks
  */
-int MineField::CountAdjacentMark(int r, int c)
+int MineField::CountAdjacentMark(int r, int c) const
 {
 	int x[] = {r - 1, r, r + 1};
 	int y[] = {c - 1, c, c + 1};
@@ -306,7 +304,17 @@ int MineField::CountAdjacentMark(int r, int c)
 	return cnt;
 }
 
-MineField::MineField1D MineField::operator[](int r)
+difficulty MineField::GetDifficulty() const
+{
+	for (int d = 0; d < 3; ++d)
+	{
+		if (row == _size[d][0] && col == _size[d][1] && num == _size[d][2])
+			return static_cast<difficulty>(d);
+	}
+	return NA;
+}
+
+MineField::MineField1D MineField::operator[](int r) const
 {
 	if (r >= 0 && r < row)
 		return {_map + r * col, col};

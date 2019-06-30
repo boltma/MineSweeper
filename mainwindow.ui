@@ -37,7 +37,6 @@
     </property>
    </widget>
   </widget>
-  <widget class="QStatusBar" name="statusBar"/>
   <widget class="QMenuBar" name="menuBar">
    <property name="geometry">
     <rect>
@@ -47,15 +46,49 @@
      <height>26</height>
     </rect>
    </property>
+   <widget class="QMenu" name="Game">
+    <property name="title">
+     <string>游戏</string>
+    </property>
+    <addaction name="Easy"/>
+    <addaction name="Medium"/>
+    <addaction name="Hard"/>
+    <addaction name="Customize"/>
+   </widget>
+   <widget class="QMenu" name="Record">
+    <property name="title">
+     <string>记录</string>
+    </property>
+    <addaction name="ViewRecord"/>
+   </widget>
+   <addaction name="Game"/>
+   <addaction name="Record"/>
   </widget>
-  <widget class="QToolBar" name="mainToolBar">
-   <attribute name="toolBarArea">
-    <enum>TopToolBarArea</enum>
-   </attribute>
-   <attribute name="toolBarBreak">
-    <bool>false</bool>
-   </attribute>
-  </widget>
+  <action name="ViewRecord">
+   <property name="text">
+    <string>查看记录</string>
+   </property>
+  </action>
+  <action name="Easy">
+   <property name="text">
+    <string>简单</string>
+   </property>
+  </action>
+  <action name="Medium">
+   <property name="text">
+    <string>中等</string>
+   </property>
+  </action>
+  <action name="Hard">
+   <property name="text">
+    <string>困难</string>
+   </property>
+  </action>
+  <action name="Customize">
+   <property name="text">
+    <string>自定义</string>
+   </property>
+  </action>
  </widget>
  <layoutdefault spacing="6" margin="11"/>
  <customwidgets>

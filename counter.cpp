@@ -15,7 +15,7 @@ void Counter::SetCnt(int n)
 void Counter::DecCount()
 {
 	this->display(--cnt);
-	if(!cnt)
+	if (!cnt)
 		emit Switch();
 }
 

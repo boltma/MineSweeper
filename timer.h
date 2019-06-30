@@ -1,6 +1,7 @@
 #ifndef TIMER_H
 #define TIMER_H
 
+#include <QDateTime>
 #include <QLCDNumber>
 #include <QTimer>
 
@@ -10,6 +11,8 @@ Q_OBJECT
 
 private:
 	int display_time;
+	int elapsed_time;
+	QDateTime time;
 	QTimer* t;
 
 private slots:
@@ -18,7 +21,8 @@ private slots:
 public:
 	explicit Timer(QWidget* parent = nullptr);
 	~Timer();
-	int GetTime();
+	const QDateTime& GetStartTime() const;
+	int GetTime() const;
 	void Reset();
 
 public slots:

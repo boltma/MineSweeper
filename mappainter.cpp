@@ -13,31 +13,31 @@ MapPainter::MapPainter(QWidget* parent) :
 {
 	layout->setSpacing(0);
 	layout->setMargin(0);
-	this->setLayout(layout);
-	const QSize& button_size = field->_map->button->size();
-	this->setFixedSize(field->col * button_size.width(), field->row * button_size.height() + timer->size().height() + spacing_height);
-
 	connect(counter, &Counter::Switch, &UnclickedButton::SwitchStatus);
 	connect(button, &GameButton::Restart, this, &MapPainter::RestartGame);
-	InitiateField();
-	layout->addWidget(button, 0, 4, 1, 1, Qt::AlignCenter);
-	layout->addWidget(timer, 0, 0, 1, 3);
-	layout->addWidget(counter, 0, field->col - 3, 1, 3);
 	layout->addItem(spacer, 1, 0);
+	Initialize();
 }
 
 MapPainter::~MapPainter()
 {
 	// No need to delete spacer because layout takes care of it
-	layout->deleteLater();
+	delete layout;
 	delete button;
 	delete counter;
 	delete timer;
-	delete field;
+	delete field; // wouldn't matter if delete nullptr
 }
 
-void MapPainter::InitiateField()
+// Only cares about buttons, not timer or counter
+void MapPainter::Initialize()
 {
+	// Set size
+	const QSize& button_size = field->_map->button->size();
+	this->setFixedSize(field->col * button_size.width(),
+	                   field->row * button_size.height() + timer->size().height() + spacing_height);
+
+	// Connect signals and add widgets to layout
 	for (int i = 0; i < field->row; ++i)
 	{
 		for (int j = 0; j < field->col; ++j)
@@ -50,6 +50,7 @@ void MapPainter::InitiateField()
 	connect(field, &MineField::Lose, timer, &Timer::StopTime);
 	connect(field, &MineField::DecCounter, counter, &Counter::DecCount);
 	connect(field, &MineField::IncCounter, counter, &Counter::IncCount);
+	connect(field, &MineField::Win, this, &MapPainter::UpdateRanking);
 	for (int r = 0; r < field->row; ++r)
 	{
 		for (int c = 0; c < field->col; ++c)
@@ -57,6 +58,9 @@ void MapPainter::InitiateField()
 			layout->addWidget((*field)[r][c].button, r + 2, c);
 		}
 	}
+	layout->addWidget(button, 0, 3, 1, field->col - 6, Qt::AlignCenter);
+	layout->addWidget(timer, 0, 0, 1, 3);
+	layout->addWidget(counter, 0, field->col - 3, 1, 3);
 }
 
 void MapPainter::UpdateLayout(int r, int c)
@@ -66,10 +70,33 @@ void MapPainter::UpdateLayout(int r, int c)
 
 void MapPainter::RestartGame()
 {
-	field->deleteLater();
-	field = new MineField();
+	NewGame(field->row, field->col, field->num); // same size as before
+}
+
+void MapPainter::NewGameDifficulty(difficulty d)
+{
+	layout->removeWidget(timer);
+	layout->removeWidget(button);
+	layout->removeWidget(counter);
+	delete field;
+	field = new MineField(d);
 	timer->Reset();
 	counter->SetCnt(field->num);
-	InitiateField();
+	Initialize();
+	emit Resize();
+}
+
+void MapPainter::NewGame(int r, int c, int n)
+{
+	// no need to remove buttons because destructor of button takes care
+	layout->removeWidget(timer);
+	layout->removeWidget(button);
+	layout->removeWidget(counter);
+	delete field;
+	field = new MineField(r, c, n);
+	timer->Reset();
+	counter->SetCnt(field->num);
+	Initialize();
+	emit Resize();
 	// todo
 }

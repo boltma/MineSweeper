@@ -16,7 +16,7 @@ protected:
 	void mousePressEvent(QMouseEvent* event) override;
 
 public:
-    GameButton();
+	GameButton();
 
 public slots:
 	void Win();
