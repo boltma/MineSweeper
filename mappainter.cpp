@@ -45,9 +45,12 @@ void MapPainter::Initialize()
 			connect(&(*field)[i][j], &Block::Refresh, this, &MapPainter::UpdateLayout);
 		}
 	}
+	connect(this, &MapPainter::DecCnt, field, &MineField::DecCnt);
 	connect(field, &MineField::StartTimer, timer, &Timer::StartTime);
 	connect(field, &MineField::Win, timer, &Timer::StopTime);
 	connect(field, &MineField::Lose, timer, &Timer::StopTime);
+	connect(field, &MineField::Win, button, &GameButton::Win);
+	connect(field, &MineField::Lose, button, &GameButton::Lose);
 	connect(field, &MineField::DecCounter, counter, &Counter::DecCount);
 	connect(field, &MineField::IncCounter, counter, &Counter::IncCount);
 	connect(field, &MineField::Win, this, &MapPainter::UpdateRanking);
@@ -66,6 +69,8 @@ void MapPainter::Initialize()
 void MapPainter::UpdateLayout(int r, int c)
 {
 	layout->addWidget((*field)[r][c].button, r + 2, c);
+	(*field)[r][c].button->show();
+	emit DecCnt();
 }
 
 void MapPainter::RestartGame()

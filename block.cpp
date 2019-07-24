@@ -274,7 +274,6 @@ void Block::OpenMine()
 	if (this->HasMine())
 		emit ClickMine();
 	emit Refresh(row, col); // update layout
-	emit DecCnt();
 }
 
 void Block::ClearFlag()

@@ -4,5 +4,8 @@
         <file alias="minesweeper">img/minesweeper.png</file>
         <file alias="explosion">img/explosion.png</file>
         <file alias="mine">img/mine.png</file>
+        <file alias="button">img/button.png</file>
+        <file alias="win">img/win.png</file>
+        <file alias="lose">img/lose.png</file>
     </qresource>
 </RCC>

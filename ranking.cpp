@@ -101,7 +101,6 @@ void Ranking::NewScore(Score& s)
 RecordBoard::RecordBoard(const Ranking& r) : text(new QLabel(this))
 {
 	// Todo
-	text->setFixedSize(600, 400);
 	for (const auto& s : r.list)
 	{
 		for (const auto& i : s)
@@ -115,6 +114,9 @@ RecordBoard::RecordBoard(const Ranking& r) : text(new QLabel(this))
 		record += '\n';
 	}
 	text->setText(record);
+	text->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Expanding);
+	this->setWindowTitle("Records");
+	this->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Expanding);
 }
 
 RecordBoard::~RecordBoard()

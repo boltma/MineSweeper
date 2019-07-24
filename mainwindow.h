@@ -28,7 +28,7 @@ private slots:
 
 public slots:
 	void Resize();
-	void NewRecord();
+	void NewScore();
 
 signals:
 	void NewDifficulty(difficulty);

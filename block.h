@@ -117,7 +117,6 @@ signals:
 	void Refresh(int, int); // refresh graphics
 	void Mark(); // Mark mine, counter decrement, slot in minefield, then in counter
 	void Question(); // Question block, counter increment
-	void DecCnt(); // Decrease cnt in minefield
 	void ClickMine(); // Click on mine, lose
 };
 

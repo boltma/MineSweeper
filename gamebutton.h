@@ -8,7 +8,7 @@ class GameButton : public QPushButton
 Q_OBJECT
 
 private:
-	static QIcon& gaming_icon();
+	static QIcon& button_icon();
 	static QIcon& win_icon();
 	static QIcon& lose_icon();
 

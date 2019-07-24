@@ -62,7 +62,6 @@ void MineField::Initialize() const
 			connect(&(*this)[i][j], &Block::DualRelease, this, &MineField::DualRestore);
 			connect(&(*this)[i][j], &Block::Mark, this, &MineField::DecCounter);
 			connect(&(*this)[i][j], &Block::Question, this, &MineField::IncCounter);
-			connect(&(*this)[i][j], &Block::DecCnt, this, &MineField::DecCnt);
 			connect(&(*this)[i][j], &Block::ClickMine, this, &MineField::ClickMine);
 			connect(this, &MineField::Lose, &Block::LoseGame);
 		}

@@ -32,6 +32,7 @@ public:
 	~MapPainter();
 
 signals:
+	void DecCnt();
 	void Resize();
 	void UpdateRanking();
 
