@@ -32,6 +32,7 @@ public slots:
 
 signals:
 	void NewDifficulty(difficulty);
+	void NewCustomDifficulty(int, int, int);
 };
 
 #endif // MAINWINDOW_H

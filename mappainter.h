@@ -25,7 +25,9 @@ private slots:
 	void UpdateLayout(int, int);
 	void RestartGame();
 	void NewGameDifficulty(difficulty);
+	void NewGameDifficulty(int, int, int);
 	void NewGame(int, int, int);
+	void TimeOut();
 
 public:
 	explicit MapPainter(QWidget* parent = nullptr);

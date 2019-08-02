@@ -28,6 +28,9 @@ public:
 public slots:
 	void StartTime();
 	void StopTime();
+
+signals:
+	void TimeOut();
 };
 
 #endif // TIMER_H

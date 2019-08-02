@@ -1,4 +1,5 @@
 #include "timer.h"
+#include <QMessageBox>
 
 Timer::Timer(QWidget* parent) : QLCDNumber(parent), display_time(0), elapsed_time(0), t(new QTimer)
 {
@@ -14,10 +15,17 @@ Timer::~Timer()
 
 void Timer::IncTime()
 {
-	/*
-	 * Todo: begin counting after laying mines, end game after 1000 seconds.
-	 */
 	++display_time;
+	if(display_time >= 1000)
+	{
+		auto m = new QMessageBox(this);
+		m->setIcon(QMessageBox::Warning);
+		m->setText("Timeout!");
+		m->setAttribute(Qt::WA_DeleteOnClose);
+		m->show();
+		emit TimeOut();
+		return;
+	}
 	this->display(display_time);
 }
 

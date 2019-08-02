@@ -58,9 +58,7 @@ Ranking::~Ranking()
 	{
 		out.close();
 	}
-	catch (std::exception&)
-	{
-	}
+	catch (std::exception&) {}
 }
 
 bool Ranking::isEmpty(difficulty d) const
@@ -81,7 +79,7 @@ void Ranking::NewScore(Score& s)
 		int n = 0;
 		if (!list[s.d].empty())
 			n = list[s.d].rbegin()->num; // num of largest time
-		if (list[s.d].size() > list_length)
+		if (list[s.d].size() >= list_length)
 		{
 			list[s.d].erase(--list[s.d].end());
 			out.seekp(n, ios_base::beg);
@@ -100,23 +98,38 @@ void Ranking::NewScore(Score& s)
 
 RecordBoard::RecordBoard(const Ranking& r) : text(new QLabel(this))
 {
-	// Todo
-	for (const auto& s : r.list)
+	const char* d[] = {
+		"<h1> Easy </h1>\n",
+		"<h1> Medium </h1>\n",
+		"<h1> Hard </h1>\n"
+	};
+	for (int n = 0; n < 3; ++n)
 	{
+		const auto& s = r.list[n];
+		record += d[n];
+		if (s.empty())
+			record += "null\n";
+		else
+			record += "<div>\n<ol>\n";
 		for (const auto& i : s)
 		{
-			QString temp(std::to_string(i.time / 1000.0).c_str());
-			temp += ' ';
+			QString temp("<li>");
+			temp += QString::number(i.time / 1000.0, 'f', 3);
+			temp += QString("&nbsp;").repeated(17 - temp.length());
 			temp += i.start_time.toString(Qt::SystemLocaleDate);
-			temp += '\n';
+			temp += "</li>\n";
 			record += temp;
 		}
+		if (!s.empty())
+			record += "</ol>\n</div>\n";
 		record += '\n';
 	}
+	record += "<p> Show at most 10 records for each level. </p>\n";
 	text->setText(record);
-	text->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Expanding);
+	text->setMargin(5);
+	text->setFont(QFont("Arial", 10));
+	text->adjustSize();
 	this->setWindowTitle("Records");
-	this->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Expanding);
 }
 
 RecordBoard::~RecordBoard()

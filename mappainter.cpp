@@ -1,4 +1,6 @@
 #include "mappainter.h"
+#include <stdexcept>
+#include <QMessageBox>
 
 const int spacing_height = 30;
 
@@ -54,6 +56,8 @@ void MapPainter::Initialize()
 	connect(field, &MineField::DecCounter, counter, &Counter::DecCount);
 	connect(field, &MineField::IncCounter, counter, &Counter::IncCount);
 	connect(field, &MineField::Win, this, &MapPainter::UpdateRanking);
+	connect(timer, &Timer::TimeOut, field, &MineField::Lose);
+	connect(timer, &Timer::TimeOut, this, &MapPainter::TimeOut);
 	for (int r = 0; r < field->row; ++r)
 	{
 		for (int c = 0; c < field->col; ++c)
@@ -64,6 +68,7 @@ void MapPainter::Initialize()
 	layout->addWidget(button, 0, 3, 1, field->col - 6, Qt::AlignCenter);
 	layout->addWidget(timer, 0, 0, 1, 3);
 	layout->addWidget(counter, 0, field->col - 3, 1, 3);
+	button->RefreshButton();
 }
 
 void MapPainter::UpdateLayout(int r, int c)
@@ -91,6 +96,30 @@ void MapPainter::NewGameDifficulty(difficulty d)
 	emit Resize();
 }
 
+void MapPainter::NewGameDifficulty(int r, int c, int n)
+{
+	layout->removeWidget(timer);
+	layout->removeWidget(button);
+	layout->removeWidget(counter);
+	delete field;
+	try
+	{
+		field = new MineField(r, c, n);
+	}
+	catch (std::invalid_argument&)
+	{
+		auto m = new QMessageBox(this);
+		m->setIcon(QMessageBox::Critical);
+		m->setText("Invalid input!");
+		m->setAttribute(Qt::WA_DeleteOnClose);
+		m->show();
+	}
+	timer->Reset();
+	counter->SetCnt(field->num);
+	Initialize();
+	emit Resize();
+}
+
 void MapPainter::NewGame(int r, int c, int n)
 {
 	// no need to remove buttons because destructor of button takes care
@@ -103,5 +132,9 @@ void MapPainter::NewGame(int r, int c, int n)
 	counter->SetCnt(field->num);
 	Initialize();
 	emit Resize();
-	// todo
+}
+
+void MapPainter::TimeOut()
+{
+	field->OpenAll();
 }

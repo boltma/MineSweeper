@@ -1,4 +1,5 @@
 #include "mainwindow.h"
+#include "custommenu.h"
 #include "ui_mainwindow.h"
 #include <QDialog>
 #include <QMessageBox>
@@ -13,7 +14,9 @@ MainWindow::MainWindow(QWidget* parent) :
 	connect(ui->widget, &MapPainter::UpdateRanking, this, &MainWindow::NewScore);
 	connect(ui->ViewRecord, &QAction::triggered, this, &MainWindow::ViewRecord);
 	connect(ui->Game, &QMenu::triggered, this, &MainWindow::SendDifficulty);
-	connect(this, &MainWindow::NewDifficulty, ui->widget, &MapPainter::NewGameDifficulty);
+	connect(this, &MainWindow::NewDifficulty, ui->widget, qOverload<difficulty>(&MapPainter::NewGameDifficulty));
+	connect(this, &MainWindow::NewCustomDifficulty, ui->widget,
+	        qOverload<int, int, int>(&MapPainter::NewGameDifficulty));
 	this->setWindowIcon(QIcon(":/minesweeper"));
 	this->setWindowTitle(tr("MineSweeper"));
 	Resize();
@@ -41,6 +44,13 @@ void MainWindow::SendDifficulty(QAction* action)
 		emit NewDifficulty(medium);
 	else if (action == ui->Hard)
 		emit NewDifficulty(hard);
+	else if (action == ui->Customize)
+	{
+		auto m = new CustomMenu(this);
+		m->setAttribute(Qt::WA_DeleteOnClose);
+		connect(m, &CustomMenu::SendSize, this, &MainWindow::NewCustomDifficulty);
+		m->exec();
+	}
 }
 
 void MainWindow::Resize()
@@ -60,7 +70,7 @@ void MainWindow::NewScore()
 	Score temp(d, ui->widget->timer->GetStartTime(), ui->widget->timer->GetTime());
 	if (rank->isEmpty(d) || temp < rank->GetBestScore(d))
 	{
-		QMessageBox* m = new QMessageBox(this);
+		auto m = new QMessageBox(this);
 		m->setIcon(QMessageBox::Information);
 		m->setText("New Record!");
 		m->setAttribute(Qt::WA_DeleteOnClose);

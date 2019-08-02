@@ -3,12 +3,12 @@
 GameButton::GameButton()
 {
 	this->setFixedSize(50, 50);
+	this->setIconSize(QSize(30, 30));
 	this->setIcon(button_icon());
 }
 
 QIcon& GameButton::button_icon()
 {
-	//todo:
 	static QIcon icon(":/button");
 	return icon;
 }
@@ -27,14 +27,17 @@ QIcon& GameButton::lose_icon()
 
 void GameButton::mousePressEvent(QMouseEvent* event)
 {
-	// todo:
 	this->setIcon(button_icon());
 	emit Restart();
 }
 
+void GameButton::RefreshButton()
+{
+	this->setIcon(button_icon());
+}
+
 void GameButton::Win()
 {
-	// todo:
 	this->setIcon(win_icon());
 }
 

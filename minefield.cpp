@@ -6,7 +6,7 @@ using namespace std;
 
 Map::Map(int r, int c, int n) : row(r), col(c), num(n)
 {
-	if (r <= 0 || c <= 0 || n <= 0) // Todo: invalid argument exception
+	if (r < 9 || r > 16 || c < 9 || c > 30 || n < 10 || n >= r * c)
 		throw std::invalid_argument("Invalid argument!");
 	_map = new Block[row * col];
 	for (int i = 0; i < r; ++i)
@@ -75,6 +75,21 @@ void MineField::MarkAll() const
 		for (int j = 0; j < col; ++j)
 		{
 			(*this)[i][j].button->SetMark();
+		}
+	}
+}
+
+void MineField::OpenAll() const
+{
+	ClickedButton::SetFlag(false);
+	for (int i = 0; i < row; ++i)
+	{
+		for (int j = 0; j < col; ++j)
+		{
+			Block& block = (*this)[i][j];
+			block.OpenMine();
+			if (!block.HasMine() && (block.HasMark() || block.HasQuestion()))
+				block.button->setDisabled(true);
 		}
 	}
 }
@@ -211,26 +226,13 @@ void MineField::DecCnt()
 	{
 		MarkAll(); // First mark all, then emit Win signal
 		emit Win();
-		// Todo
 	}
 }
 
 void MineField::ClickMine()
 {
 	emit Lose(); // First emit Lose signal, then open all
-	// todo
-	ClickedButton::SetFlag(false);
-	// All open, timer would stop
-	for (int i = 0; i < row; ++i)
-	{
-		for (int j = 0; j < col; ++j)
-		{
-			Block& block = (*this)[i][j];
-			block.OpenMine();
-			if (!block.HasMine() && (block.HasMark() || block.HasQuestion()))
-				block.button->setDisabled(true);
-		}
-	}
+	OpenAll(); // All open, timer would stop
 }
 
 /**

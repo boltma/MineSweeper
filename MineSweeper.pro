@@ -33,7 +33,8 @@ SOURCES += \
     mappainter.cpp \
     counter.cpp \
     gamebutton.cpp \
-    ranking.cpp
+    ranking.cpp \
+    custommenu.cpp
 
 HEADERS += \
         mainwindow.h \
@@ -43,10 +44,12 @@ HEADERS += \
     mappainter.h \
     counter.h \
     gamebutton.h \
-    ranking.h
+    ranking.h \
+    custommenu.h
 
 FORMS += \
-        mainwindow.ui
+        mainwindow.ui \
+    custommenu.ui
 
 # Default rules for deployment.
 qnx: target.path = /tmp/$${TARGET}/bin

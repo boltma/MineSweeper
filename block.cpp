@@ -193,7 +193,6 @@ void ClickedButton::mouseReleaseEvent(QMouseEvent*)
 {
 	if (dual_flag)
 	{
-		// Todo
 		emit DualRelease();
 		dual_flag = false;
 	}
@@ -248,10 +247,6 @@ bool Block::Lost()
 
 void Block::OpenMine()
 {
-	if (HasMine())
-	{
-		// Todo: Lose
-	}
 	if (flag & ~MINE) // Open/Question/Mark
 		return;
 	flag |= OPEN;

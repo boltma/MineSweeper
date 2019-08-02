@@ -46,6 +46,7 @@ private:
 
 	int cnt; // #blocks - #mines - #clicked
 	void MarkAll() const; // Mark all unclicked buttons after winning
+	void OpenAll() const; // Open all unclicked buttons after losing
 
 private slots:
 	void LayMine(int, int);

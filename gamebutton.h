@@ -17,6 +17,7 @@ protected:
 
 public:
 	GameButton();
+	void RefreshButton();
 
 public slots:
 	void Win();
